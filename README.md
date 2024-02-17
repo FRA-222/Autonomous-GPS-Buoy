@@ -6,6 +6,8 @@ How to build PlatformIO based project
 3. Extract ZIP archive
 4. Run these commands:
 
+Ceci est un test de mise à jour du Repo Git
+
 ```shell
 # Change directory to example
 $ cd platform-renesas-ra/examples/arduino-iot-cloud-basic
