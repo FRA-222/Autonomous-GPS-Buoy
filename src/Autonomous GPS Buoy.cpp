@@ -154,7 +154,7 @@ void setup() {
   pinMode(brakePinM2, OUTPUT);
 
 
-  //Initialisation IMU
+  /* //Initialisation IMU
   Wire.begin();                    //Initialize I2C communication to the let the library communicate with the sensor.
   //Sensor Initialization
   mySensor.initSensor();          //The I2C Address can be changed here inside this function in the library
@@ -181,12 +181,14 @@ void setup() {
   delay(1000);	//Wait for a second
   Serial.println("1...");
   delay(1000);	//Wait for a second
-
+   */
 }
 
 void loop() {
   ArduinoCloud.update();
   
+
+  /*
   if (updateSensorData)  //Keep the updating of data as a separate task
   {
     mySensor.updateAccel();        //Update the Accelerometer data
@@ -246,7 +248,7 @@ void loop() {
 
     updateSensorData = true;
   }
-
+  */
 
 
   switch (navigationMode)
@@ -320,7 +322,7 @@ void loop() {
 
 
 
-  /* Mise en commentaire le temps de faire fonctionner le GPS 
+  ///* Mise en commentaire le temps de faire fonctionner le GPS 
   // put the GPS in standby mode
   Serial.println("standby");
   GPS.standby();
@@ -370,7 +372,7 @@ void loop() {
   Serial.println(satellites);
 
   Serial.println();
-  Fin du commentaire concernant le GPS */
+  //Fin du commentaire concernant le GPS */
 }
 
 
