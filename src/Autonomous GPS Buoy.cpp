@@ -28,7 +28,7 @@
 
 //CloudLocation gpsHomeLocation;
 
-// Définition de l'image n°1
+// Définition de l'image n°1 pour afficher une flêche
 byte picture1[8][12] = {
 
   { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
