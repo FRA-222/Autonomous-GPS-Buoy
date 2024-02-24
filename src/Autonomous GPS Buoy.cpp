@@ -19,59 +19,59 @@
 #include <Arduino_MKRGPS.h>
 #include "Arduino_NineAxesMotion.h" //Contains the bridge code between the API and the Arduino Environment
 #include <Wire.h>
-#include <StateManagement.h>
+#include <NavigationMode.h>
 
-//#include "Arduino_LED_Matrix.h"
+// #include "Arduino_LED_Matrix.h"
 
-//Définition des variables locales
-//static int const LED_BUILTIN = 2;
-//ArduinoLEDMatrix matrix;
+// Définition des variables locales
+// static int const LED_BUILTIN = 2;
+// ArduinoLEDMatrix matrix;
 
-//CloudLocation gpsHomeLocation;
+// CloudLocation gpsHomeLocation;
 
 // Définition de l'image n°1 pour afficher une flêche
 byte picture1[8][12] = {
 
-  { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
 
-  { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0},
 
-  { 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0},
 
-  { 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0 },
+    {0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0},
 
-  { 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0 },
+    {0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0},
 
-  { 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0 },
+    {1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
 
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 };
 
 // Définition de l'image n°2
 byte picture2[8][12] = {
 
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 
 };
 
-//Variables pour la gestion des deux Moteurs
+// Variables pour la gestion des deux Moteurs
 int directionPinM1 = 12;
 int pwmPinM1 = 3;
 int brakePinM1 = 9;
@@ -87,25 +87,23 @@ bool directionStateM2;
 float vitesseM1;
 float vitesseM2;
 
+// Variables pour la Gestion de l'IMU
+NineAxesMotion mySensor;          // Object that for the sensor
+unsigned long lastStreamTime = 0; // To store the last streamed time stamp
+const int streamPeriod = 40;      // To stream at 25Hz without using additional timers (time period(ms) =1000/frequency(Hz))
+bool updateSensorData = true;     // Flag to update the sensor data. Default is true to perform the first read before the first stream
 
-//Variables pour la Gestion de l'IMU
-NineAxesMotion mySensor;                 //Object that for the sensor
-unsigned long lastStreamTime = 0;     //To store the last streamed time stamp
-const int streamPeriod = 40;          //To stream at 25Hz without using additional timers (time period(ms) =1000/frequency(Hz))
-bool updateSensorData = true;         //Flag to update the sensor data. Default is true to perform the first read before the first stream
+// objet pour la Gestion des états
+NavigationMode navigationMode2;
 
-
-//objet pour la Gestion des états
-StateManagement stateMAnagement;
-
-
-
-void setup() {
+void setup()
+{
   /* Initialize serial and wait up to 5 seconds for port to open */
   Serial.begin(9600);
-  for(unsigned long const serialBeginTime = millis(); !Serial && (millis() - serialBeginTime > 5000); ) { }
+  for (unsigned long const serialBeginTime = millis(); !Serial && (millis() - serialBeginTime > 5000);)
+  {
+  }
 
-  
   /* This function takes care of connecting your sketch variables to the ArduinoIoTCloud object */
   initProperties();
 
@@ -115,48 +113,45 @@ void setup() {
   setDebugMessageLevel(DBG_INFO);
   ArduinoCloud.printDebugInfo();
 
-  //Initialisation de la Matrice d'affichage
-  //matrix.begin();
-  
-  //Initialisation temporaire des coordonnées GPS - A supprimer
-  gpsBuoyLocation = Location(48.759539 , 2.429735);
+  // Initialisation de la Matrice d'affichage
+  // matrix.begin();
 
-  //Initialise le mode de Navigation à 0, le temps que l'état initial soit défini
+  // Initialisation temporaire des coordonnées GPS - A supprimer
+  gpsBuoyLocation = Location(48.759539, 2.429735);
+
+  // Initialise le mode de Navigation à 0, le temps que l'état initial soit défini
   navigationMode = 1;
-
 
   // If you are using the MKR GPS as shield, change the next line to pass
   // the GPS_MODE_SHIELD parameter to the GPS.begin(...)
-  if (!GPS.begin(GPS_MODE_UART)) {
+  if (!GPS.begin(GPS_MODE_UART))
+  {
     Serial.println("Failed to initialize GPS!");
     while (1);
     gpsReady = false;
   }
-  else  
+  else
     gpsReady = true;
 
-
-  //Remplacer en cible par les test Bousole Magnétique, DataLink et batteryStatus
+  // Remplacer en cible par les test Bousole Magnétique, DataLink et batteryStatus
   dataLinkReady = true;
   magnetReady = false;
   batteryStatus = 45;
 
-  //Met à 0 les commandes manuelles
+  // Met à 0 les commandes manuelles
   speed = 0;
   orientation = 0;
-  
-  //Initialise le CAP lorsque la bousole magnétique fonctionnera
+
+  // Initialise le CAP lorsque la bousole magnétique fonctionnera
   cap = 45;
-  
-  
-  //Définit les PIN pour les moteurs A et B
+
+  // Définit les PIN pour les moteurs A et B
   pinMode(directionPinM1, OUTPUT);
   pinMode(pwmPinM1, OUTPUT);
   pinMode(brakePinM1, OUTPUT);
   pinMode(directionPinM2, OUTPUT);
   pinMode(pwmPinM2, OUTPUT);
   pinMode(brakePinM2, OUTPUT);
-
 
   /* //Initialisation IMU
   Wire.begin();                    //Initialize I2C communication to the let the library communicate with the sensor.
@@ -188,9 +183,9 @@ void setup() {
    */
 }
 
-void loop() {
+void loop()
+{
   ArduinoCloud.update();
-  
 
   /*
   if (updateSensorData)  //Keep the updating of data as a separate task
@@ -254,56 +249,69 @@ void loop() {
   }
   */
 
+  //--------------------------------------------
+  //
+  //   Utilisation des sorties de la gestion des modes
+  //   pour gerer les asservissements
+  //
+  //--------------------------------------------
 
-  switch (navigationMode)
+  navigationMode2.calculateMode(navigationMode);
+
+  switch (navigationMode2.getEtat())
   {
-  case 1 : //HOME
-    /* code */
-    break;
-  
-  case 2 : //HOLD
-    /* code */
+  case WAIT_HOME:
+    Serial.println("WAIT_HOME ");
     break;
 
-  case 3 : // STOP
-    //activate breaks
+  case HOME:
+    Serial.println("HOME");
+    break;
+
+  case HOLD:
+    Serial.println("HOLD");
+    break;
+
+  case STOP:
+    Serial.println("STOP");
+    // activate breaks
     digitalWrite(brakePinM1, HIGH);
     digitalWrite(brakePinM2, HIGH);
 
-    //set work duty for the motor to 0 (off)
+    // set work duty for the motor to 0 (off)
     analogWrite(pwmPinM1, 0);
     analogWrite(pwmPinM2, 0);
 
     speed = 0;
     orientation = 0;
-
     break;
 
-  case 4 : // NAV BASIC
-    //Démarre en marche avant
+  case NAV_BASIC:
+    Serial.println("NAV_BASIC");
+    // Démarre en marche avant
     digitalWrite(directionPinM1, HIGH);
     digitalWrite(directionPinM2, HIGH);
-    
-    //release breaks
+
+    // release breaks
     digitalWrite(brakePinM1, LOW);
     digitalWrite(brakePinM2, LOW);
 
-    //set work duty for the motor
+    // set work duty for the motor
     if (orientation > 40)
     {
-      vitesseM1 = speed / orientation ;
+      vitesseM1 = speed / orientation;
       vitesseM2 = speed;
     }
 
     if (orientation < -40)
     {
-      vitesseM1 = speed ;
+      vitesseM1 = speed;
       vitesseM2 = speed / abs(orientation);
     }
 
-    if (orientation > -40 && orientation < 40 )
+    if (orientation > -40 && orientation < 40)
     {
-      vitesseM1 = speed ;
+      vitesseM1 = speed;
       vitesseM2 = speed;
     }
 
@@ -312,21 +320,20 @@ void loop() {
 
     break;
 
-  case 5 : // NAV CAP
-    /* code */
+  case NAV_CAP:
+    Serial.println("NAV_CAP");
     break;
 
-  case 6 : // NAV TARGET
-    /* code */
+  case NAV_TARGET:
+    Serial.println("NAV_TARGET");
     break;
 
   default:
     break;
   }
 
-
-
-  ///* Mise en commentaire le temps de faire fonctionner le GPS 
+  
+  /* Mise en commentaire le temps de faire fonctionner le GPS
   // put the GPS in standby mode
   //Serial.println("standby");
   //GPS.standby();
@@ -376,55 +383,49 @@ void loop() {
   Serial.println(satellites);
 
   Serial.println();
-  //Fin du commentaire concernant le GPS */
+  Fin du commentaire concernant le GPS */
 }
 
+void onHomeMemorisationCommandChange()
+{
 
-
-
-void onHomeMemorisationCommandChange()  {
-  
   if (homeMemorisationCommand)
   {
-      Serial.println("onHomeMemorisationCommandChange : homeMemorisationCommand true");
-      
-  }    
+    Serial.println("onHomeMemorisationCommandChange : homeMemorisationCommand true");
+  }
   else
   {
-      Serial.println("onHomeMemorisationCommandChange : homeMemorisationCommand false");
-      
+    Serial.println("onHomeMemorisationCommandChange : homeMemorisationCommand false");
   }
 }
 
-void onNavigationModeChange()  {
-  
-    Serial.println("onNavigationModeChange : navigationMode : " + String(navigationMode) );
-      
+void onNavigationModeChange()
+{
+
+  Serial.println("onNavigationModeChange : navigationMode : " + String(navigationMode));
 }
 
-void onGpsBuoyLocationChange()  {
-  
-    //Serial.println("onGpsBuoyLocationChange : gpsBuoyLocation : " + gpsBuoyLocation.getValue().lat + " - " + gpsBuoyLocation.getValue().lon );
-    Serial.println("onGpsBuoyLocationChange : gpsBuoyLocation : " + String(gpsBuoyLocation.getValue().lat) + " - " + String(gpsBuoyLocation.getValue().lon));
-    
+void onGpsBuoyLocationChange()
+{
+
+  // Serial.println("onGpsBuoyLocationChange : gpsBuoyLocation : " + gpsBuoyLocation.getValue().lat + " - " + gpsBuoyLocation.getValue().lon );
+  Serial.println("onGpsBuoyLocationChange : gpsBuoyLocation : " + String(gpsBuoyLocation.getValue().lat) + " - " + String(gpsBuoyLocation.getValue().lon));
 }
 
-void onSpeedChange()  {
-  
-    Serial.println("onSpeedChange : speed : " + String(speed));
-      
+void onSpeedChange()
+{
+
+  Serial.println("onSpeedChange : speed : " + String(speed));
 }
 
-void onOrientationChange()  {
-  
-    Serial.println("onOrientationChange : orientation : " + String(orientation));
-      
+void onOrientationChange()
+{
+
+  Serial.println("onOrientationChange : orientation : " + String(orientation));
 }
 
-void onCapChange()  {
-  
-    Serial.println("onCapChange : cap : " + String(cap));
-      
+void onCapChange()
+{
+
+  Serial.println("onCapChange : cap : " + String(cap));
 }
-
-
