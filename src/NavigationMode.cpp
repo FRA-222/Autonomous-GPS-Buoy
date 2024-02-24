@@ -48,7 +48,7 @@ tEtats NavigationMode::getEtat()
     return etat;
 }
 
-void NavigationMode::switchEtat(int navigationMode)
+void NavigationMode::switchMode(int navigationMode)
 {
     // Memorisation des commandes en entree de l automate
     // homeMemorisationComPrecedente = homeMemorisationCom;

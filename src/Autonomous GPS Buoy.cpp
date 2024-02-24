@@ -332,6 +332,7 @@ void loop()
     break;
   }
 
+  navigationMode2.switchMode(navigationMode);
   
   /* Mise en commentaire le temps de faire fonctionner le GPS
   // put the GPS in standby mode

@@ -83,7 +83,7 @@ public:
     ~NavigationMode();
     void calculateMode(int navigationMode);
     tEtats getEtat();
-    void switchEtat(int navigationMode);
+    void switchMode(int navigationMode);
 
     
 
