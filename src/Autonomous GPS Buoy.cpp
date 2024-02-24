@@ -19,6 +19,7 @@
 #include <Arduino_MKRGPS.h>
 #include "Arduino_NineAxesMotion.h" //Contains the bridge code between the API and the Arduino Environment
 #include <Wire.h>
+#include <StateManagement.h>
 
 //#include "Arduino_LED_Matrix.h"
 
@@ -94,6 +95,9 @@ const int streamPeriod = 40;          //To stream at 25Hz without using addition
 bool updateSensorData = true;         //Flag to update the sensor data. Default is true to perform the first read before the first stream
 
 
+//objet pour la Gestion des états
+StateManagement stateMAnagement;
+
 
 
 void setup() {
@@ -123,7 +127,7 @@ void setup() {
 
   // If you are using the MKR GPS as shield, change the next line to pass
   // the GPS_MODE_SHIELD parameter to the GPS.begin(...)
-  if (!GPS.begin(GPS_MODE_SHIELD)) {
+  if (!GPS.begin(GPS_MODE_UART)) {
     Serial.println("Failed to initialize GPS!");
     while (1);
     gpsReady = false;
@@ -324,16 +328,16 @@ void loop() {
 
   ///* Mise en commentaire le temps de faire fonctionner le GPS 
   // put the GPS in standby mode
-  Serial.println("standby");
-  GPS.standby();
+  //Serial.println("standby");
+  //GPS.standby();
 
   // wait for 10 seconds
-  Serial.print("delay ");
-  for (int i = 0; i < 10; i++) {
-    delay(1000);
-    Serial.print(".");
-  }
-  Serial.println();
+  //Serial.print("delay ");
+  //for (int i = 0; i < 10; i++) {
+  //  delay(1000);
+  //  Serial.print(".");
+  //}
+  //Serial.println();
 
   // wake up the GPS
   Serial.println("wakeup");
