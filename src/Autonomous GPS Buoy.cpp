@@ -185,7 +185,8 @@ void setup() {
 }
 
 void loop() {
-  ArduinoCloud.update();
+
+  ArduinoCloud.update();  //acquisition des commandes en provenance du Dashboard
   
   if (updateSensorData)  //Keep the updating of data as a separate task
   {
@@ -247,7 +248,10 @@ void loop() {
     updateSensorData = true;
   }
 
+  
+//  Reception des commandes en provenance du Dashboard
 
+//  Gestion des modes
 
   switch (navigationMode)
   {
@@ -308,7 +312,7 @@ void loop() {
 
   case 5 : // NAV CAP
     /* code */
-    break;
+    bvreak;
 
   case 6 : // NAV TARGET
     /* code */
