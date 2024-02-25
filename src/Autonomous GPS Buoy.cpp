@@ -93,8 +93,19 @@ unsigned long lastStreamTime = 0; // To store the last streamed time stamp
 const int streamPeriod = 40;      // To stream at 25Hz without using additional timers (time period(ms) =1000/frequency(Hz))
 bool updateSensorData = true;     // Flag to update the sensor data. Default is true to perform the first read before the first stream
 
+
+//---Surveillance dataLinkReady
+bool dlOk;               // Validite de DataLink
+//---Acquisition et surveillance capteurs
+// GPS
+bool posOk;  // Validite de la postion de la bouee
+// Boussole
+bool magnetOk; // Validite du cap magnetique de la bouee
+
+
+
 // objet pour la Gestion des états
-NavigationMode navigationMode2;
+NavigationMode navigationMode;
 
 void setup()
 {
@@ -120,7 +131,7 @@ void setup()
   gpsBuoyLocation = Location(48.759539, 2.429735);
 
   // Initialise le mode de Navigation à 0, le temps que l'état initial soit défini
-  navigationMode = 1;
+  dashboardNavigationModeCde = 1;
 
   // If you are using the MKR GPS as shield, change the next line to pass
   // the GPS_MODE_SHIELD parameter to the GPS.begin(...)
@@ -134,8 +145,6 @@ void setup()
     gpsReady = true;
 
   // Remplacer en cible par les test Bousole Magnétique, DataLink et batteryStatus
-  dataLinkReady = true;
-  magnetReady = false;
   batteryStatus = 45;
 
   // Met à 0 les commandes manuelles
@@ -181,6 +190,9 @@ void setup()
   Serial.println("1...");
   delay(1000);	//Wait for a second
    */
+
+  
+
 }
 
 void loop()
@@ -249,6 +261,24 @@ void loop()
   }
   */
 
+  //Force les valeurs pour confirmer que les capteurs sont Ok pour les tests
+  dlOk = true; 
+  posOk = true;
+  magnetOk = true;
+
+
+  //Indique les états des capteurs au dashboard
+  if (dlOk)
+    dataLinkReady = true;
+
+  if (posOk)
+    gpsReady = true;
+
+  if (magnetOk)
+    magnetReady = true;
+
+
+
   //--------------------------------------------
   //
   //   Utilisation des sorties de la gestion des modes
@@ -256,20 +286,48 @@ void loop()
   //
   //--------------------------------------------
 
-  navigationMode2.calculateMode(navigationMode);
+  navigationMode.calculateMode(dashboardNavigationModeCde, dlOk, posOk, magnetOk);
 
-  switch (navigationMode2.getEtat())
+  switch (navigationMode.getEtat())
   {
   case WAIT_HOME:
     Serial.println("WAIT_HOME ");
+
+    //Remonte l'état au dashboard
+    dashboardNavigationModeCde = WAIT_HOME;
+    dashboardEtatHome = true;
+    dashboardEtatHold = false;
+    dashboardEtatStop = false;
+    dashboardEtatNavBasic = false;
+    dashboardEtatNavCap = false;
+    dashboardEtatNavTarget = false;
     break;
 
   case HOME:
     Serial.println("HOME");
+
+
+    //Remonte l'état au dashboard
+    dashboardNavigationModeCde = HOME;
+    dashboardEtatHome = true;
+    dashboardEtatHold = false;
+    dashboardEtatStop = false;
+    dashboardEtatNavBasic = false;
+    dashboardEtatNavCap = false;
+    dashboardEtatNavTarget = false;
     break;
 
   case HOLD:
     Serial.println("HOLD");
+
+    //Remonte l'état au dashboard
+    dashboardNavigationModeCde = HOLD;
+    dashboardEtatHome = false;
+    dashboardEtatHold = true;
+    dashboardEtatStop = false;
+    dashboardEtatNavBasic = false;
+    dashboardEtatNavCap = false;
+    dashboardEtatNavTarget = false;
     break;
 
   case STOP:
@@ -284,6 +342,16 @@ void loop()
 
     speed = 0;
     orientation = 0;
+
+    //Remonte l'état au dashboard
+    dashboardNavigationModeCde = STOP;
+    dashboardEtatHome = false;
+    dashboardEtatHold = false;
+    dashboardEtatStop = true;
+    dashboardEtatNavBasic = false;
+    dashboardEtatNavCap = false;
+    dashboardEtatNavTarget = false;
+
     break;
 
   case NAV_BASIC:
@@ -318,21 +386,50 @@ void loop()
     analogWrite(pwmPinM1, vitesseM1);
     analogWrite(pwmPinM2, vitesseM2);
 
+
+
+    //Remonte l'état au dashboard
+    dashboardNavigationModeCde = NAV_BASIC;
+    dashboardEtatHome = false;
+    dashboardEtatHold = false;
+    dashboardEtatStop = false;
+    dashboardEtatNavBasic = true;
+    dashboardEtatNavCap = false;
+    dashboardEtatNavTarget = false;
     break;
 
   case NAV_CAP:
     Serial.println("NAV_CAP");
+
+    //Remonte l'état au dashboard
+    dashboardNavigationModeCde = NAV_CAP;
+    dashboardEtatHome = false;
+    dashboardEtatHold = false;
+    dashboardEtatStop = false;
+    dashboardEtatNavBasic = false;
+    dashboardEtatNavCap = true;
+    dashboardEtatNavTarget = false;
     break;
 
   case NAV_TARGET:
     Serial.println("NAV_TARGET");
+
+
+    //Remonte l'état au dashboard
+    dashboardNavigationModeCde = NAV_TARGET;
+    dashboardEtatHome = false;
+    dashboardEtatHold = false;
+    dashboardEtatStop = false;
+    dashboardEtatNavBasic = false;
+    dashboardEtatNavCap = false;
+    dashboardEtatNavTarget = true;
     break;
 
   default:
     break;
   }
 
-  navigationMode2.switchMode(navigationMode);
+  navigationMode.switchMode(dashboardNavigationModeCde);
   
   /* Mise en commentaire le temps de faire fonctionner le GPS
   // put the GPS in standby mode
@@ -400,10 +497,10 @@ void onHomeMemorisationCommandChange()
   }
 }
 
-void onNavigationModeChange()
+void onDashboardNavigationModeCdeChange()
 {
 
-  Serial.println("onNavigationModeChange : navigationMode : " + String(navigationMode));
+  Serial.println("onNavigationModeChange : navigationMode : " + String(dashboardNavigationModeCde));
 }
 
 void onGpsBuoyLocationChange()

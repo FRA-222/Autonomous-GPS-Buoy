@@ -29,7 +29,6 @@ public:
     //---Surveillance dataLinkReady
     static char32_t heureDL; // Heure dernier rafraichissement DL
     bool dlOk;               // Validite de DataLink
-
     //---Acquisition et surveillance capteurs
     // GPS
     double xLat; // Latitude de la bouee
@@ -38,7 +37,6 @@ public:
     // Boussole
     float cap;     // Cap magnetique de la bouee
     bool magnetOk; // Validite du cap magnetique de la bouee
-
     //---Gestion des modes de navigation
     // Commandes en provenance de la station sol
     static bool homeMemorisationComPrecedente; // Etat de la commande de memorisation du Home du cycle precedent
@@ -81,7 +79,7 @@ public:
 
     NavigationMode();
     ~NavigationMode();
-    void calculateMode(int navigationMode);
+    void calculateMode(int navigationMode, bool datalinOk, bool gpsOk, bool magnetCapOk);
     tEtats getEtat();
     void switchMode(int navigationMode);
 

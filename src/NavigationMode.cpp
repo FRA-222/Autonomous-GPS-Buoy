@@ -1,6 +1,7 @@
 #include "NavigationMode.h"
 #include <Arduino.h>
 
+
 bool NavigationMode::homeMemorisationComPrecedente = false; // Etat de la commande de memorisation du Home du cycle precedent
 int NavigationMode::navicationModePrecedent = 0;            // Mode de navigation demande au cycle precedent
 
@@ -57,10 +58,17 @@ void NavigationMode::switchMode(int navigationMode)
     etatPrecedent = etat;
 }
 
-void NavigationMode::calculateMode(int navigationMode)
+void NavigationMode::calculateMode(int navigationMode, bool datalinOk, bool gpsOk, bool magnetCapOk)
 {
+
+    dlOk = datalinOk;
+    posOk = gpsOk;
+    magnetOk = magnetCapOk;
+
     //---Lecture des entrees de l automate
     // frontMontantDefinirHome = homeMemorisationCom && !homeMemorisationComPrecedente;
+    //Simule la definition du Home
+    frontMontantDefinirHome = true;
     frontMontantHome = false;
     if (navigationMode != navicationModePrecedent && navigationMode == 1)
     {
