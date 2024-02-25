@@ -12,7 +12,7 @@ void onGpsReadyChange();
 void onMagnetReadyChange();
 void onHomeMemorisationCommandChange();
 void onBatteryStatusChange();
-void onNavigationModeChange();
+void onDashboardNavigationModeCdeChange();
 void onGpsBuoyLocationChange();
 void onSpeedChange();
 void onOrientationChange();
@@ -38,7 +38,7 @@ int batteryStatus;
 // 4 - NAV BASIC
 // 5 - NAV CAP
 // 6 - NAV TARGET
-int navigationMode;
+int dashboardNavigationModeCde;
 //Coordonnées GPS à conserver par la Bouée Autonome, dans le mode Hold
 CloudLocation gpsBuoyLocation;
 //Puissance pour les moteurs en mode manuel : -100 à +100
@@ -47,9 +47,13 @@ int speed;
 int orientation;
 //Cap : 0 est le Nord - Valeurs entre 0 et 360 degrés
 int cap;
-
-
-
+//Etats de la Bouée qui remonte vers le Dashboard
+bool dashboardEtatHome;
+bool dashboardEtatHold;
+bool dashboardEtatStop;
+bool dashboardEtatNavBasic;
+bool dashboardEtatNavCap;
+bool dashboardEtatNavTarget;
 
 
 void initProperties() {
@@ -59,7 +63,7 @@ void initProperties() {
 #endif
 #if defined(BOARD_HAS_WIFI) || defined(BOARD_HAS_GSM) || defined(BOARD_HAS_NB) || defined(BOARD_HAS_ETHERNET) || defined(BOARD_HAS_CATM1_NBIOT)
   ArduinoCloud.addProperty(cap, READWRITE, ON_CHANGE, onCapChange);
-  ArduinoCloud.addProperty(navigationMode, READWRITE, ON_CHANGE, onNavigationModeChange);
+  ArduinoCloud.addProperty(dashboardNavigationModeCde, READWRITE, ON_CHANGE, onDashboardNavigationModeCdeChange);
   ArduinoCloud.addProperty(orientation, READWRITE, ON_CHANGE, onOrientationChange);
   ArduinoCloud.addProperty(speed, READWRITE, ON_CHANGE, onSpeedChange);
   ArduinoCloud.addProperty(gpsBuoyLocation, READWRITE, ON_CHANGE, onGpsBuoyLocationChange);
@@ -68,6 +72,12 @@ void initProperties() {
   ArduinoCloud.addProperty(homeMemorisationCommand, READWRITE, ON_CHANGE, onHomeMemorisationCommandChange);
   ArduinoCloud.addProperty(magnetReady, READ, ON_CHANGE, NULL);
   ArduinoCloud.addProperty(batteryStatus, READ, ON_CHANGE, NULL);
+  ArduinoCloud.addProperty(dashboardEtatHome, READ, ON_CHANGE, NULL);
+  ArduinoCloud.addProperty(dashboardEtatHold, READ, ON_CHANGE, NULL);
+  ArduinoCloud.addProperty(dashboardEtatStop, READ, ON_CHANGE, NULL);
+  ArduinoCloud.addProperty(dashboardEtatNavBasic, READ, ON_CHANGE, NULL);
+  ArduinoCloud.addProperty(dashboardEtatNavCap, READ, ON_CHANGE, NULL);
+  ArduinoCloud.addProperty(dashboardEtatNavTarget, READ, ON_CHANGE, NULL);
   
 #elif defined(BOARD_HAS_LORA)
   ArduinoCloud.addProperty(led, 1, READWRITE, ON_CHANGE, onLedChange);
