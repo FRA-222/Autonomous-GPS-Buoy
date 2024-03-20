@@ -18,8 +18,6 @@ void onSpeedChange();
 void onOrientationChange();
 void onCapChange();
 
-
-
 //Variables liées au Dashboard de commande des Bouées
 //Le Datalink est il opérationnel
 bool dataLinkReady;
