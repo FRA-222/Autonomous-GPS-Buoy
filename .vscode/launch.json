@@ -12,11 +12,11 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "/Users/philippe/Documents/PlatformIO/Projects/Autonomous GPS Buoy/.pio/build/uno_r4_wifi/firmware.elf",
+            "executable": "/Users/alain/Documents/PlatformIO/Projects/Autonomous-GPS-Buoy/Autonomous-GPS-Buoy/.pio/build/uno_r4_wifi/firmware.elf",
             "projectEnvName": "uno_r4_wifi",
-            "toolchainBinDir": "/Users/philippe/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "toolchainBinDir": "/Users/alain/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/Users/philippe/.platformio/platforms/renesas-ra/misc/svd/R7FA4M1AB.svd",
+            "svdPath": "/Users/alain/.platformio/platforms/renesas-ra/misc/svd/R7FA4M1AB.svd",
             "preLaunchTask": {
                 "type": "PlatformIO",
                 "task": "Pre-Debug"
@@ -26,21 +26,21 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "/Users/philippe/Documents/PlatformIO/Projects/Autonomous GPS Buoy/.pio/build/uno_r4_wifi/firmware.elf",
+            "executable": "/Users/alain/Documents/PlatformIO/Projects/Autonomous-GPS-Buoy/Autonomous-GPS-Buoy/.pio/build/uno_r4_wifi/firmware.elf",
             "projectEnvName": "uno_r4_wifi",
-            "toolchainBinDir": "/Users/philippe/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "toolchainBinDir": "/Users/alain/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/Users/philippe/.platformio/platforms/renesas-ra/misc/svd/R7FA4M1AB.svd"
+            "svdPath": "/Users/alain/.platformio/platforms/renesas-ra/misc/svd/R7FA4M1AB.svd"
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
-            "executable": "/Users/philippe/Documents/PlatformIO/Projects/Autonomous GPS Buoy/.pio/build/uno_r4_wifi/firmware.elf",
+            "executable": "/Users/alain/Documents/PlatformIO/Projects/Autonomous-GPS-Buoy/Autonomous-GPS-Buoy/.pio/build/uno_r4_wifi/firmware.elf",
             "projectEnvName": "uno_r4_wifi",
-            "toolchainBinDir": "/Users/philippe/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "toolchainBinDir": "/Users/alain/.platformio/packages/toolchain-gccarmnoneeabi/bin",
             "internalConsoleOptions": "openOnSessionStart",
-            "svdPath": "/Users/philippe/.platformio/platforms/renesas-ra/misc/svd/R7FA4M1AB.svd",
+            "svdPath": "/Users/alain/.platformio/platforms/renesas-ra/misc/svd/R7FA4M1AB.svd",
             "loadMode": "manual"
         }
     ]
